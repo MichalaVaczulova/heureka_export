@@ -85,7 +85,8 @@ function product_get_description($product){
       $position2 = stripos ($content, $dot, $offset); //find second dot using offset
       $first_two = substr ($content, 0, $position2); //put two first sentences under $first_two
 
-      return $first_two . '.'; //add a dot
+      $first_two=strip_tags($first_two);
+      return $first_two.'.'; 
     }
    return "";
 }
