@@ -34,6 +34,12 @@ function generate_xml_for_heureka() {
    print_xml_footer();
 }
 
+function get_image($product,$number) {
+   $images=$product->get_gallery_image_ids();
+   $image_url = wp_get_attachment_image_url( $images[$number], 'full' );
+   return $image_url;
+}
+
 function generate_shopitem($product_id) {
    // functions for products are defined in ...wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-product.php
    // Get $product object from product ID
@@ -45,6 +51,11 @@ function generate_shopitem($product_id) {
    echo '      <PRODUCTNAME>'.$product->get_name().'</PRODUCTNAME>'.PHP_EOL;
    echo '      <PRODUCT>'.$product->get_name().'</PRODUCT>'.PHP_EOL;
    echo '      <DESCRIPTION>'.product_get_description($product).'</DESCRIPTION>'.PHP_EOL;
+   echo '      <URL>'.get_permalink($product_id).'</URL>'.PHP_EOL;
+   echo '      <IMGURL>'.get_image($product,0).'</IMGURL>'.PHP_EOL;
+   echo '      <IMGURL_ALTERNATIVE>'.get_image($product,1).'</IMGURL_ALTERNATIVE>'.PHP_EOL;
+   echo '      <PRICE_VAT>'.$product->get_price().'</PRICE_VAT>'.PHP_EOL;
+   echo '      <CATEGORYTEXT>Elektronika | Smart domácnosť </CATEGORYTEXT>'.PHP_EOL;
 
    echo '   </SHOPITEM>'.PHP_EOL;
 
