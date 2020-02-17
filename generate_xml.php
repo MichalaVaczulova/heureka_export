@@ -13,9 +13,9 @@ function get_product_ids(){
    
    $ids = array();
    foreach ( $products_IDs->get_posts() as $prid){
-   	if ($test_mode && count($ids) == 2) {
-   		break;
-	}
+   	#if ($test_mode && count($ids) == 2) {
+   	#	break;
+	#}
 	$ids[] = $prid->ID;
    }
    
@@ -40,6 +40,28 @@ function get_image($product,$number) {
    return $image_url;
 }
 
+function get_delivery_date($product) {
+   $status=$product->get_stock_status();
+   if ($status == "instock") {
+      return 0;  # in stock
+   }
+   else {
+      return 8; # delivery in two weeks
+   }
+} 
+
+function get_manufacturer($product) {
+   # for this attribute, please add new attribute in the product properties (vlastnosti) with the name Manufacturer and value equal to needed string
+
+   $attrib_array = $product->get_attributes();
+   $manufacturer = $attrib_array["manufacturer"]["options"][0];
+   if ($manufacturer == NULL) {
+      fwrite (STDERR, "Warning: Manufacturer not set for product with id ".$product->get_id()."\n");
+      $manufacturer = "";
+   }
+   return $manufacturer;  
+}
+
 function generate_shopitem($product_id) {
    // functions for products are defined in ...wp-content/plugins/woocommerce/includes/abstracts/abstract-wc-product.php
    // Get $product object from product ID
@@ -55,33 +77,35 @@ function generate_shopitem($product_id) {
    echo '      <IMGURL>'.get_image($product,0).'</IMGURL>'.PHP_EOL;
    echo '      <IMGURL_ALTERNATIVE>'.get_image($product,1).'</IMGURL_ALTERNATIVE>'.PHP_EOL;
    echo '      <PRICE_VAT>'.$product->get_price().'</PRICE_VAT>'.PHP_EOL;
+   echo '      <MANUFACTURER>'.get_manufacturer($product).'</MANUFACTURER>'.PHP_EOL;
+   # HARDCODED #
    echo '      <CATEGORYTEXT>Elektronika | Smart domácnosť </CATEGORYTEXT>'.PHP_EOL;
-
+   # /HARDCODED #
+   echo '      <DELIVERY_DATE>'.get_delivery_date($product).'</DELIVERY_DATE>'.PHP_EOL;
+   # HARDCODED #
+   echo '      <DELIVERY>'.PHP_EOL;
+   echo '        <DELIVERY_ID>ZASILKOVNA</DELIVERY_ID>'.PHP_EOL;
+   echo '        <DELIVERY_PRICE>3,99</DELIVERY_PRICE>'.PHP_EOL;
+   echo '      </DELIVERY>'.PHP_EOL;
+   # /HARDCODED #
    echo '   </SHOPITEM>'.PHP_EOL;
+   
+   #Poznamky
+   # echo '       <DELIVERY_PRICE_COD></DELIVERY_PRICE_COD>'.PHP_EOL;  # cena s dobierkou. Ak nepodporujeme dobierku, tag neuvadzat
+   #
+   # Tag MANUFACTURER sa cita z vlastnosti produktu, ktoru si musim rucne zadefinovat ku kazdemu produktu. Napr Manufacturer: Amazon
+   #
+   # Tagy PARAM a ITEMGROUP_ID sa pouzivaju ak ide o skupinu produktov s variaciou, napriklad tricko v bielej a modrej farbe a v mnohych velkostiach.
+   #  PARAM definuju presny popis jedneho tricka, ITEMGROUP_ID je rovnake pre vsetky tricka zo skupiny - U nas zatial nic taketo nemame. 
+   # Aj rozne farby echo zariadeni mame vzdy ako zvlast produkt
+   #
+   # Prislusenstvo k tomuto produktu sa uvadza do tagu <ACCESSORY> item_id</ACCESORY>, kde item_id reprezentuje to prislusenstvo.Je mozne uviest viackrat
+   # My zatial nevedieme tuto moznost 
+  
 
- 
 
-   #echo "Product(".$product_id."):".$product->get_name()."\n";
-   #echo "Slug:".$product->get_slug()."\n";
-   #echo "Price:".$product->get_price()."\n";
-   #echo "Categories:\n";
-   #foreach ($product->get_category_ids() as $id){
-   #        if( $term = get_term_by( 'id', $id, 'product_cat' ) ){
-   # 		echo $term->name;
-   #     	echo "|"; 
-   #        }
-   #}
-   #echo "\n";
-   #echo "Permalink:".get_permalink( $product->get_id() )."\n";
-## #  $product->get_image_id();
-## #  $product->get_image();
-   #$images=$product->get_gallery_image_ids();
-   #$image1_url = wp_get_attachment_image_url( $images[0], 'full' );
-   #$image2_url = wp_get_attachment_image_url( $images[1], 'full' );
-   #echo "Image1:".$image1_url."\n";
-   #echo "Image2:".$image2_url."\n";
-   #echo "\n\n";
-#  # echo "Description:".$product->get_description()."\n";
+   #var_dump($product);
+
 
 }
 
