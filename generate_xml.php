@@ -54,10 +54,16 @@ function get_manufacturer($product) {
    # for this attribute, please add new attribute in the product properties (vlastnosti) with the name Manufacturer and value equal to needed string
 
    $attrib_array = $product->get_attributes();
+
+   # manual added variable "Manufacturer" is represented by "manufacturer", name is directly written in array 
    $manufacturer = $attrib_array["manufacturer"]["options"][0];
    if ($manufacturer == NULL) {
-      fwrite (STDERR, "Warning: Manufacturer not set for product with id ".$product->get_id()."\n");
-      $manufacturer = "";
+      # variable set to WP "Manufacturer" is represented by "pa_manufacturer" and values are integers to another field...
+      $manufacturer = array_shift( wc_get_product_terms( $product->id, 'pa_manufacturer', array( 'fields' => 'names' ) ) );
+      if ($manufacturer == NULL) {
+         fwrite (STDERR, "Warning: Manufacturer not set for product with id ".$product->get_id()."\n");
+         $manufacturer = "";
+      }
    }
    return $manufacturer;  
 }
